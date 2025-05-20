@@ -1,22 +1,21 @@
 package com.projectsky.auth.service;
 
-import com.projectsky.auth.dto.JwtAuthenticationDto;
-import com.projectsky.auth.dto.RefreshTokenDto;
-import com.projectsky.auth.dto.UserCredentialsDto;
-import com.projectsky.auth.dto.UserDto;
+import com.projectsky.auth.dto.*;
 import org.springframework.data.crossstore.ChangeSetPersister;
 
 import javax.naming.AuthenticationException;
 
 public interface UserService {
 
-    JwtAuthenticationDto signIn(UserCredentialsDto userCredentialsDto) throws AuthenticationException;
+    JwtAuthenticationDto signIn(UserCredentialsDto userCredentialsDto);
 
     JwtAuthenticationDto refreshToken(RefreshTokenDto refreshTokenDto) throws Exception;
 
-    String addUser(UserDto userDto);
+    JwtAuthenticationDto completeRegistration(RegisterPasswordRequest request);
 
-    UserDto getUserById(String id) throws ChangeSetPersister.NotFoundException;
+    void initRegistration(RegisterInitRequest request);
 
-    UserDto getUserByEmail(String email) throws ChangeSetPersister.NotFoundException;
+    void confirmCode(ConfirmCodeRequest request);
+
+
 }

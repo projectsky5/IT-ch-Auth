@@ -1,7 +1,7 @@
 package com.projectsky.auth.dto;
 
-public record UserDto(
+public record RegisterInitRequest(
         String email,
-        String password
+        String fullName
 ) {
 }

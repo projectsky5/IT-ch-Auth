@@ -23,4 +23,11 @@ public class User {
     private String email;
 
     private String password;
+
+    private String fullName;
+
+    @Column(nullable = false)
+    private boolean isConfirmed;
+
+    private String confirmationCode;
 }

@@ -1,6 +1,7 @@
 package com.projectsky.auth.security.jwt;
 
 import com.projectsky.auth.dto.JwtAuthenticationDto;
+import com.projectsky.auth.util.RoleResolver;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -18,9 +19,14 @@ import java.util.Date;
 public class JwtService {
 
     private static final Logger log = LoggerFactory.getLogger(JwtService.class);
+    private final RoleResolver roleResolver;
 
     @Value("${jwt.secret}")
     private String jwtSecret;
+
+    public JwtService(RoleResolver roleResolver) {
+        this.roleResolver = roleResolver;
+    }
 
     /**
      * 1. Если пользователь заходит первый раз - оба токена == null
@@ -88,10 +94,11 @@ public class JwtService {
 
     private String generateJwtToken(String email) {
         Date date = Date.from(LocalDateTime.now().plusHours(1).atZone(ZoneId.systemDefault()).toInstant());
+        String role = roleResolver.resolveRoleFromEmail(email);
         return Jwts.builder()
                 .subject(email)
                 .expiration(date)
-                // .claim(n, n) - добавит кастом поле в payload
+                .claim("role", role)
                 .signWith(getSignInKey())
                 .compact();
     }
@@ -109,5 +116,15 @@ public class JwtService {
     private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    private String resolveRoleFromEmail(String email) {
+        if (email.endsWith("@edu.hse.ru")) {
+            return "STUDENT";
+        } else if (email.endsWith("@hse.ru")) {
+            return "TEACHER";
+        } else {
+            throw new IllegalArgumentException("Unknown domain: " + email);
+        }
     }
 }
